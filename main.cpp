@@ -77,7 +77,7 @@ int main()
       {
         lead_worker_is_appointed[randomLeadWorker] = true;
         temp_lead_worker_counts_for_firms[randomFirm]--;
-        cout << firms[randomFirm] << " : " << workers[randomLeadWorker] << endl;
+        cout << firms[randomFirm] << " : " << leadWorkers[randomLeadWorker] << endl;
         total_requested_lead_worker_count--;
       }
     }
