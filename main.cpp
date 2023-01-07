@@ -39,7 +39,7 @@ int main()
   }
 
   srand(time(0));
-  int i = 0;
+  cout << "Appointed Workers List" << endl;
   while (total_requested_worker_count)
   {
     int randomFirm = rand() % NUM_FIRMS;
@@ -53,6 +53,32 @@ int main()
         temp_worker_counts_for_firms[randomFirm]--;
         cout << firms[randomFirm] << " : " << workers[randomWorker] << endl;
         total_requested_worker_count--;
+      }
+    }
+  }
+
+  int temp_lead_worker_counts_for_firms[NUM_FIRMS];
+  int total_requested_lead_worker_count = 0;
+  for (int i = 0; i < NUM_FIRMS; i++)
+  {
+    total_requested_lead_worker_count += lead_worker_counts_for_firms[i];
+    temp_lead_worker_counts_for_firms[i] = lead_worker_counts_for_firms[i];
+  }
+
+  cout << "Appointed Lead Workers List" << endl;
+  while (total_requested_lead_worker_count)
+  {
+    int randomFirm = rand() % NUM_FIRMS;
+    int randomLeadWorker = rand() % NUM_LEAD_WORKERS;
+
+    if (lead_worker_is_appointed[randomLeadWorker] == false)
+    {
+      if (temp_lead_worker_counts_for_firms[randomFirm] > 0)
+      {
+        lead_worker_is_appointed[randomLeadWorker] = true;
+        temp_lead_worker_counts_for_firms[randomFirm]--;
+        cout << firms[randomFirm] << " : " << workers[randomLeadWorker] << endl;
+        total_requested_lead_worker_count--;
       }
     }
   }
