@@ -25,9 +25,37 @@ int main()
   bool worker_is_appointed[NUM_WORKERS];
   bool lead_worker_is_appointed[NUM_WORKERS];
 
-  for (int i = 0; i < NUM_WORKERS; i++)   worker_is_appointed[i] = false;
-  for (int i = 0; i < NUM_LEAD_WORKERS; i++)    lead_worker_is_appointed[i] = false;
-  
+  for (int i = 0; i < NUM_WORKERS; i++)
+    worker_is_appointed[i] = false;
+  for (int i = 0; i < NUM_LEAD_WORKERS; i++)
+    lead_worker_is_appointed[i] = false;
+
+  int temp_worker_counts_for_firms[NUM_FIRMS];
+  int total_requested_worker_count = 0;
+  for (int i = 0; i < NUM_FIRMS; i++)
+  {
+    total_requested_worker_count += worker_counts_for_firms[i];
+    temp_worker_counts_for_firms[i] = worker_counts_for_firms[i];
+  }
+
+  srand(time(0));
+  int i = 0;
+  while (total_requested_worker_count)
+  {
+    int randomFirm = rand() % NUM_FIRMS;
+    int randomWorker = rand() % NUM_WORKERS;
+
+    if (worker_is_appointed[randomWorker] == false)
+    {
+      if (temp_worker_counts_for_firms[randomFirm] > 0)
+      {
+        worker_is_appointed[randomWorker] = true;
+        temp_worker_counts_for_firms[randomFirm]--;
+        cout << firms[randomFirm] << " : " << workers[randomWorker] << endl;
+        total_requested_worker_count--;
+      }
+    }
+  }
 
   return 0;
 }
