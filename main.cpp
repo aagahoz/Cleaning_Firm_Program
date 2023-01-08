@@ -25,10 +25,18 @@ int main()
   bool worker_is_appointed[NUM_WORKERS];
   bool lead_worker_is_appointed[NUM_WORKERS];
 
-  for (int i = 0; i < NUM_WORKERS; i++)
-    worker_is_appointed[i] = false;
+  bool worker_was_appointed_firms[NUM_WORKERS][NUM_FIRMS];
+
   for (int i = 0; i < NUM_LEAD_WORKERS; i++)
     lead_worker_is_appointed[i] = false;
+
+  for (int i = 0; i < NUM_WORKERS; i++)
+  {
+    for (int j = 0; j < NUM_FIRMS; j++)
+    {
+      worker_was_appointed_firms[i][j] = false;
+    }
+  }
 
   int temp_worker_counts_for_firms[NUM_FIRMS];
   int total_requested_worker_count = 0;
@@ -40,21 +48,62 @@ int main()
 
   srand(time(0));
   cout << "Appointed Workers List" << endl;
-  while (total_requested_worker_count)
+  bool isMaximumIterationReached = false;
+  for (int k = 0; k < 30; k++)
   {
-    int randomFirm = rand() % NUM_FIRMS;
-    int randomWorker = rand() % NUM_WORKERS;
+    for (int i = 0; i < NUM_WORKERS; i++)
+      worker_is_appointed[i] = false;
 
-    if (worker_is_appointed[randomWorker] == false)
+    int temp_worker_counts_for_firms[NUM_FIRMS];
+    int total_requested_worker_count = 0;
+    for (int i = 0; i < NUM_FIRMS; i++)
     {
-      if (temp_worker_counts_for_firms[randomFirm] > 0)
+      total_requested_worker_count += worker_counts_for_firms[i];
+      temp_worker_counts_for_firms[i] = worker_counts_for_firms[i];
+    }
+    unsigned long long int endlessLoopChecker = 0;
+    while (total_requested_worker_count)
+    {
+      int selectedFirm = rand() % NUM_FIRMS;
+      int randomWorker = rand() % NUM_WORKERS;
+
+      if (worker_is_appointed[randomWorker] == false)
       {
-        worker_is_appointed[randomWorker] = true;
-        temp_worker_counts_for_firms[randomFirm]--;
-        cout << firms[randomFirm] << " : " << workers[randomWorker] << endl;
-        total_requested_worker_count--;
+        if (temp_worker_counts_for_firms[selectedFirm] > 0)
+        {
+          selectedFirm++;
+          if (worker_was_appointed_firms[randomWorker][selectedFirm] == false)
+          {
+            worker_is_appointed[randomWorker] = true;
+            worker_was_appointed_firms[randomWorker][selectedFirm] = true;
+            temp_worker_counts_for_firms[selectedFirm]--;
+            cout << firms[selectedFirm] << " : " << workers[randomWorker] << endl;
+            total_requested_worker_count--;
+          }
+        }
+      }
+      endlessLoopChecker++;
+      if (endlessLoopChecker > 300000)
+      {
+        cout << "Maximumum Iteration Reached" << endl;
+        isMaximumIterationReached = true;
+        break;
       }
     }
+    if (isMaximumIterationReached)
+      break;
+    cout << "Iteration is " << k << endl;
+    endlessLoopChecker = 0;
+    for (int i = 0; i < NUM_WORKERS; i++)
+    {
+      for (int j = 0; j < NUM_FIRMS; j++)
+      {
+        cout << worker_was_appointed_firms[i][j] << "  ";
+      }
+      cout << endl;
+    }
+
+    cout << k << endl;
   }
 
   int temp_lead_worker_counts_for_firms[NUM_FIRMS];
@@ -68,16 +117,16 @@ int main()
   cout << "Appointed Lead Workers List" << endl;
   while (total_requested_lead_worker_count)
   {
-    int randomFirm = rand() % NUM_FIRMS;
+    int selectedFirm = rand() % NUM_FIRMS;
     int randomLeadWorker = rand() % NUM_LEAD_WORKERS;
 
     if (lead_worker_is_appointed[randomLeadWorker] == false)
     {
-      if (temp_lead_worker_counts_for_firms[randomFirm] > 0)
+      if (temp_lead_worker_counts_for_firms[selectedFirm] > 0)
       {
         lead_worker_is_appointed[randomLeadWorker] = true;
-        temp_lead_worker_counts_for_firms[randomFirm]--;
-        cout << firms[randomFirm] << " : " << leadWorkers[randomLeadWorker] << endl;
+        temp_lead_worker_counts_for_firms[selectedFirm]--;
+        cout << firms[selectedFirm] << " : " << leadWorkers[randomLeadWorker] << endl;
         total_requested_lead_worker_count--;
       }
     }
@@ -89,3 +138,5 @@ int main()
 // İşçiler random olarak dağıtılacak, dağıtılan işçiler için şirketi var veya yok şeklinde bir ifade tutulacak
 // eğer o işçi yerleştirilmişse veya o firma talep ettiği sayıda işçiye sahip ise random bir şekilde tekrar işlemler gerçekleşecek
 // Random seçilen bir işçi random seçilen bir firmaya yerleştirilecek
+
+// işçilerin önceki çalıştıkları firmalar kontrol edilerek buna göre yeni firmalara yerleştirilecek. bu sayede tüm işçiler tüm firmalarda çalışması sağlanacak
