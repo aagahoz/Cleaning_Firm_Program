@@ -1,13 +1,15 @@
 all: clean compile link run
 
 clean:
-	rm -rf *.o ; rm -rf main
+	rm -rf *.o ; rm -rf main ; rm -rf ./lib/*.o ; rm -rf ./bin/main
 
 compile:
-	g++ -o main.o -c main.cpp
+	g++ -I ./include/ -o ./lib/library.o -c ./library.cpp
+	g++ -o ./lib/main.o -c main.cpp
 
 link:
-	g++ -o main main.o
+	g++ -I ./include/ -o ./bin/main ./lib/library.o ./main.cpp
 
 run:
-	./main
+	rm -rf *.o
+	./bin/main
