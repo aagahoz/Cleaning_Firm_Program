@@ -53,12 +53,8 @@ int main()
       reset_array_to_false_1D_init_value(index_firm_for_lead_workers, NUM_LEAD_WORKERS, NaN_Firm_Index);
 
       int *temp_lead_worker_counts_for_firms = create_1D_int_array(NUM_FIRMS);
-      int total_requested_lead_worker_count = 0;
-      for (int i = 0; i < NUM_FIRMS; i++) // calculate requested lead workers number
-      {
-        total_requested_lead_worker_count += lead_worker_counts_for_firms[i];
-        temp_lead_worker_counts_for_firms[i] = lead_worker_counts_for_firms[i];
-      }
+      copy_array_values(lead_worker_counts_for_firms, temp_lead_worker_counts_for_firms, NUM_FIRMS);
+      int total_requested_lead_worker_count = get_total_array_values(temp_lead_worker_counts_for_firms, NUM_FIRMS);
 
       while (total_requested_lead_worker_count) // iteration for lead workers
       {
