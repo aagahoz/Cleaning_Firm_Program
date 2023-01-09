@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <iomanip>
 
 using namespace std;
 
@@ -26,25 +27,108 @@ int main()
   bool lead_worker_is_appointed[NUM_WORKERS];
 
   bool worker_was_appointed_firms[NUM_WORKERS][NUM_FIRMS];
-
-  for (int i = 0; i < NUM_LEAD_WORKERS; i++)
-    lead_worker_is_appointed[i] = false;
-
-  for (int i = 0; i < NUM_WORKERS; i++)
-  {
-    for (int j = 0; j < NUM_FIRMS; j++)
-    {
-      worker_was_appointed_firms[i][j] = false;
-    }
-  }
+  bool lead_worker_was_appointed_firms[NUM_LEAD_WORKERS][NUM_FIRMS];
 
   int temp_worker_counts_for_firms[NUM_FIRMS];
   int total_requested_worker_count = 0;
 
-  srand(time(0));
+  int index_firm_for_lead_workers[NUM_LEAD_WORKERS];
+
   bool isMaximumIterationReached = false;
-  for (int k = 0; k < 20; k++)
+  bool lead_worker_rotation_need = true;
+  int iterationCounter = 20;
+  int localIteration = 1;
+
+  srand(time(0));
+  while (iterationCounter) // for 20 worker appointment iterations
   {
+    cout << endl;
+    cout << endl;
+    cout << "Local Iteration is " << localIteration << endl;
+    cout << "General Iteration is " << 21 - iterationCounter << endl;
+
+    if (lead_worker_rotation_need) // lead workers appointments
+    {
+
+      for (int i = 0; i < NUM_LEAD_WORKERS; i++) // lead_worker_is_appointed reset to false
+        lead_worker_is_appointed[i] = false;
+
+      for (int i = 0; i < NUM_WORKERS; i++) // worker_was_appointed_firms reset to false
+      {
+        for (int j = 0; j < NUM_FIRMS; j++)
+        {
+          worker_was_appointed_firms[i][j] = false;
+        }
+      }
+      for (int i = 0; i < NUM_LEAD_WORKERS; i++) // lead_worker_was_appointed_firms reset to false
+      {
+        for (int j = 0; j < NUM_FIRMS; j++)
+        {
+          lead_worker_was_appointed_firms[i][j] = false;
+        }
+      }
+
+      lead_worker_rotation_need = false;
+      for (int i = 0; i < NUM_LEAD_WORKERS; i++) // workers appointment resetting
+      {
+        index_firm_for_lead_workers[i] = -1;
+      }
+
+      int temp_lead_worker_counts_for_firms[NUM_FIRMS];
+      int total_requested_lead_worker_count = 0;
+      for (int i = 0; i < NUM_FIRMS; i++) // calculate requested lead workers number
+      {
+        total_requested_lead_worker_count += lead_worker_counts_for_firms[i];
+        temp_lead_worker_counts_for_firms[i] = lead_worker_counts_for_firms[i];
+      }
+
+      while (total_requested_lead_worker_count) // iteration for lead workers
+      {
+        int selectedFirm = rand() % NUM_FIRMS;
+        int randomLeadWorker = rand() % NUM_LEAD_WORKERS;
+
+        if (lead_worker_is_appointed[randomLeadWorker] == false) // worker is appointed ?
+        {
+          if (temp_lead_worker_counts_for_firms[selectedFirm] > 0) // work need appointment ?
+          {
+            if (lead_worker_was_appointed_firms[randomLeadWorker][selectedFirm] == false) // the worker worked the firm ?
+            {
+              lead_worker_is_appointed[randomLeadWorker] = true;
+              temp_lead_worker_counts_for_firms[selectedFirm]--;
+              // cout << firms[selectedFirm] << " : " << leadWorkers[randomLeadWorker] << endl;
+              index_firm_for_lead_workers[randomLeadWorker] = selectedFirm;
+              lead_worker_was_appointed_firms[randomLeadWorker][selectedFirm] = true;
+              total_requested_lead_worker_count--;
+            }
+          }
+        }
+      }
+
+      // cout << "Lead Workers All Appointments" << endl;
+      // for (int i = 0; i < NUM_LEAD_WORKERS; i++)
+      // {
+      //   for (int j = 0; j < NUM_FIRMS; j++)
+      //   {
+      //     cout << lead_worker_was_appointed_firms[i][j] << "  ";
+      //   }
+      //   cout << endl;
+      // }
+
+      // cout << " **   Appointed Lead Workers List   **" << endl;
+      // for (int i = 0; i < NUM_FIRMS; i++)
+      // {
+      //   cout << firms[i] << ": ";
+      //   for (int j = 0; j < NUM_WORKERS; j++)
+      //   {
+      //     if (index_firm_for_lead_workers[j] == i)
+      //     {
+      //       cout << leadWorkers[j] << "  ";
+      //     }
+      //   }
+      //   cout << endl;
+      // }
+    }
+
     for (int i = 0; i < NUM_WORKERS; i++) // reset workers is appointed array to false
       worker_is_appointed[i] = false;
 
@@ -66,13 +150,6 @@ int main()
     int temp_total_requested_worker_count = total_requested_worker_count;
     while (temp_total_requested_worker_count) // 1 worker appointment iteration
     {
-      endlessLoopChecker++;
-      if (endlessLoopChecker > 300000)
-      {
-        cout << "Maximumum Iteration Reached" << endl;
-        isMaximumIterationReached = true;
-        break;
-      }
 
       int selectedFirm = rand() % NUM_FIRMS;
       int randomWorker = rand() % NUM_WORKERS;
@@ -92,6 +169,17 @@ int main()
           }
         }
       }
+
+      endlessLoopChecker++;
+      if (endlessLoopChecker > 30000000)
+      {
+        cout << endl;
+        cout << "[INFO] Maximumum Iteration Reached" << endl;
+        cout << endl;
+        isMaximumIterationReached = true;
+        localIteration = 1;
+        break;
+      }
     }
 
     int numberOfAppointedWorkers = 0;
@@ -103,19 +191,30 @@ int main()
       }
     }
     bool iterationIsFinished = false;
-    if (numberOfAppointedWorkers == total_requested_worker_count) // checks iteration is finished
+    if (numberOfAppointedWorkers == total_requested_worker_count) // checks iteration is finished successfully
     {
       iterationIsFinished = true;
+      iterationCounter--;
+      localIteration++;
     }
 
-    if (iterationIsFinished) // prints appointed workers
+    // cout << numberOfAppointedWorkers << endl;
+    if (iterationIsFinished) // prints appointed workers with leads if iteration is finished successfully
     {
       cout << endl;
       cout << " **   Appointed Workers List   **" << endl;
       for (int i = 0; i < NUM_FIRMS; i++)
       {
-        cout << firms[i] << ": ";
-        cout << leadWorkers[i] << " ";
+        cout << firms[i] << ": " << setw(2);
+        for (int j = 0; j < NUM_LEAD_WORKERS; j++)
+        {
+          if (index_firm_for_lead_workers[j] == i)
+          {
+            cout << leadWorkers[j] << " ";
+          }
+        }
+        cout << setw((4 - lead_worker_counts_for_firms[i]) * 5);
+
         for (int j = 0; j < NUM_WORKERS; j++)
         {
           if (index_firm_for_workers[j] == i)
@@ -125,72 +224,28 @@ int main()
         }
         cout << endl;
       }
+
+      // cout << "Workers All Appointments" << endl;
+      // for (int i = 0; i < NUM_WORKERS; i++)
+      // {
+      //   for (int j = 0; j < NUM_FIRMS; j++)
+      //   {
+      //     cout << worker_was_appointed_firms[i][j] << "  ";
+      //   }
+      //   cout << endl;
+      // }
+
       cout << endl;
     }
 
     if (isMaximumIterationReached) // iteration can finish ?
-      break;
-    cout << "Iteration is " << k << endl;
+    {
+      lead_worker_rotation_need = true;
+      isMaximumIterationReached = false;
+    }
+
+    
     endlessLoopChecker = 0; // if iteration is finished, reset infinite loop checker to 0
-
-    // for (int i = 0; i < NUM_WORKERS; i++)    // prints workers table for finished iterations
-    // {
-    //   for (int j = 0; j < NUM_FIRMS; j++)
-    //   {
-    //     cout << worker_was_appointed_firms[i][j] << "  ";
-    //   }
-    //   cout << endl;
-    // }
-  }
-
-  if (1)
-  {
-    int index_firm_for_lead_workers[NUM_LEAD_WORKERS];
-    for (int i = 0; i < NUM_WORKERS; i++) // workers appointment resetting
-    {
-      index_firm_for_lead_workers[i] = -1;
-    }
-
-    int temp_lead_worker_counts_for_firms[NUM_FIRMS];
-    int total_requested_lead_worker_count = 0;
-    for (int i = 0; i < NUM_FIRMS; i++) // calculate requested lead workers number
-    {
-      total_requested_lead_worker_count += lead_worker_counts_for_firms[i];
-      temp_lead_worker_counts_for_firms[i] = lead_worker_counts_for_firms[i];
-    }
-
-    cout << "Appointed Lead Workers List" << endl; // prints appointed lead workers
-    while (total_requested_lead_worker_count)
-    {
-      int selectedFirm = rand() % NUM_FIRMS;
-      int randomLeadWorker = rand() % NUM_LEAD_WORKERS;
-
-      if (lead_worker_is_appointed[randomLeadWorker] == false) // worker is appointed ?
-      {
-        if (temp_lead_worker_counts_for_firms[selectedFirm] > 0) // work need appointment ?
-        {
-          lead_worker_is_appointed[randomLeadWorker] = true;
-          temp_lead_worker_counts_for_firms[selectedFirm]--;
-          // cout << firms[selectedFirm] << " : " << leadWorkers[randomLeadWorker] << endl;
-          index_firm_for_lead_workers[randomLeadWorker] = selectedFirm;
-          total_requested_lead_worker_count--;
-        }
-      }
-    }
-     cout << " **   Appointed Lead Workers List   **" << endl;
-      for (int i = 0; i < NUM_FIRMS; i++)
-      {
-        cout << firms[i] << ": ";
-        for (int j = 0; j < NUM_WORKERS; j++)
-        {
-          if (index_firm_for_lead_workers[j] == i)
-          {
-            cout << leadWorkers[j] << "  ";
-          }
-        }
-        cout << endl;
-      }
-
   }
 
   return 0;
